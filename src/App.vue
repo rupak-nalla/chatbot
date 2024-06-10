@@ -1,8 +1,10 @@
 <script setup>
+import { ref } from 'vue';
 // JavaScript
 let i=0;
+const isloading=ref(false);
 function generateResponse() {
-  
+  isloading.value=true;
   const responseconversation = document.getElementById('responseconversation');
   i+=1
   const queryDiv = document.getElementById('inputMsg');
@@ -14,9 +16,10 @@ function generateResponse() {
   inp.style.textAlign="right";
   inp.style.display="flex";
   inp.style.justifyContent="right";
-  msg.style.backgroundColor='#00b4d8';
+  msg.style.backgroundColor='rgb(30 41 59)';
   msg.style.width="auto";
   msg.style.padding="10px";
+  inp.style.color="white";
   msg.style.borderRadius="5px";
   const myButton = document.getElementById('generateBtn');
   // const loadingSpinner = document.createElement('div');
@@ -34,7 +37,7 @@ function generateResponse() {
       'Authorization': 'Bearer esecret_um8kn1v9hiumqctegwe93ynevg'
     },
     body: JSON.stringify({
-      model: "google/gemma-7b-it",
+      model: "meta-llama/Meta-Llama-3-8B-Instruct",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: query }
@@ -48,7 +51,7 @@ function generateResponse() {
     let op =document.getElementById(`op${i}`)
     op.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-robot" viewBox="0 0 16 16"><path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/><path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/></svg><div id="out${i}"></div>`
     let out=document.getElementById(`out${i}`)
-    out.style.backgroundColor="#00b4d8"
+    out.style.backgroundColor="rgb(30 41 59)"
     console.log(res)
     const formattedContent=formatTextToDOM(res);
     out.appendChild(formattedContent);
@@ -59,8 +62,9 @@ function generateResponse() {
     op.style.textAlign="left";
     op.style.display="flex";
     op.style.justifyContent="left";
-    myButton.innerHTML = 'Genrate response';
+    op.style.color="white";
     myButton.disabled = false;
+    isloading.value=false;
   })
   .catch(error => {
     console.error(error);
@@ -100,11 +104,7 @@ function formatTextToDOM(text) {
       paragraph.textContent = line;
       fragment.appendChild(paragraph);
 
-      // Add a new line element after the paragraph
-      // if (i < lines.length - 1) {
-      //   const newLine = document.createElement('br');
-      //   fragment.appendChild(newLine);
-      // }
+      
     }
   }
 
@@ -125,15 +125,22 @@ function formatTextToDOM(text) {
 <template>
   <div id="main">
     <div id="nav">
-      <h5 style="margin: 0px;padding: 10px;color: #caf0f8;">ChatBot powerd by Lemma</h5>
+      <h5 style="margin: 0px;padding: 10px;color: #caf0f8;">AVINYA-GPT</h5>
     </div>
     <div id="conversation">
       <div id="responseconversation" style="padding-left: 10px;padding-right: 10px;padding-top: 10px;"></div>
-      <div id="in">
-          <input type="text" class="form-control"  placeholder="enter message" id="inputMsg" >
-          <button id="generateBtn" @click="generateResponse" class="btn btn-primary">Generate Response</button>
-      </div>
-      
+      <form>
+        <div id="in">
+            
+            <input type="text" class="form-control"  placeholder="enter message" id="inputMsg" >
+            <button  type="submit" id="generateBtn" @click="generateResponse" class="btn btn-primary">
+              <div class="spinner-border" role="status" v-if="isloading">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              Generate Response</button>
+          
+        </div>
+    </form>
     </div>
   </div>
 
@@ -157,7 +164,7 @@ function formatTextToDOM(text) {
 }
 
 #conversation{
-  background-color: #0077b6;
+  background-color: rgb(51 65 85);
   padding: 0px 0px 250px 0px;
   height: 100%;
   width: 100%;
@@ -166,7 +173,7 @@ function formatTextToDOM(text) {
   overflow-x: hidden;
 }
 #nav{
-  background-color: #03045e;
+  background-color: rgb(30 41 59);
 }
 #main{
   height: 100%;
